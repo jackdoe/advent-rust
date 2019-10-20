@@ -4,10 +4,12 @@ fn main() {
 
     let mut count2: i64 = 0;
     let mut count3: i64 = 0;
-
+    let mut codes = vec![];
     for line in stdin.lock().lines() {
         let mut count_per_char: [i64; 26] = [0; 26];
-        for c in line.unwrap().chars() {
+        let l = line.unwrap();
+
+        for c in l.chars() {
             count_per_char[(c as usize) - 97] += 1; // char - 'a'
         }
 
@@ -22,7 +24,40 @@ fn main() {
                 counted3 = true;
             }
         }
+
+        codes.push(l);
     }
 
-    println!("{}", count2 * count3)
+    println!("check sum: {}", count2 * count3);
+    'FOUND: for code_a in codes.iter() {
+        for code_b in codes.iter() {
+            let (different, common) = diff(code_a, code_b);
+            if different == 1 {
+                println!("fabric code: {}", common);
+                break 'FOUND;
+            }
+        }
+    }
+}
+
+fn diff(a: &String, b: &String) -> (i32, String) {
+    let ba = a.as_bytes();
+    let bb = b.as_bytes();
+
+    if ba.len() != bb.len() {
+        return (ba.len() as i32 + bb.len() as i32, a.to_string());
+    }
+
+    let mut different: i32 = 0;
+    let mut common: String = String::new();
+
+    for i in 0..ba.len() {
+        if ba[i] != bb[i] {
+            different += 1;
+        } else {
+            common.push(ba[i] as char)
+        }
+    }
+
+    return (different, common);
 }
